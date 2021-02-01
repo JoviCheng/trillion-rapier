@@ -93,6 +93,7 @@ export function SideWallFactory(right?: boolean) {
 
 export function AwardAreaFactory() {
   let awardAreaGroup: Matter.Body[] = [];
+  // 奖励区域分隔 Body
   for (let index = 0; index < awardAreaConfig.length - 1; index++) {
     const x =
       PEGS_GROUP.LEFT_OFFSET +
@@ -112,22 +113,22 @@ export function AwardAreaFactory() {
     const x =
       PEGS_GROUP.LEFT_OFFSET +
       (index === 0 ? 1 : PEGS_GROUP.BASE_SIZE) * awardAreaConfig[index].axisX;
-    awardAreaGroup.push(
-      Matter.Bodies.rectangle(
-        x - (PEGS_GROUP.BASE_SIZE * awardAreaConfig[index].width) / 2,
-        761,
-        PEGS_GROUP.BASE_SIZE * awardAreaConfig[index].width - 2,
-        39,
-        {
-          label: "reward",
-          isStatic: true,
-          isSensor: true,
-          render: {
-            fillStyle: awardAreaConfig[index].color,
-          },
-        }
-      )
+    let awardAreaBody = Matter.Bodies.rectangle(
+      x - (PEGS_GROUP.BASE_SIZE * awardAreaConfig[index].width) / 2,
+      761,
+      PEGS_GROUP.BASE_SIZE * awardAreaConfig[index].width - 2,
+      39,
+      {
+        label: "reward",
+        isStatic: true,
+        isSensor: true,
+        render: {
+          fillStyle: awardAreaConfig[index].color,
+        },
+      }
     );
+    awardAreaBody["rewardLevel"] = awardAreaConfig[index].level;
+    awardAreaGroup.push(awardAreaBody);
   }
   return Matter.Body.create({ parts: awardAreaGroup, isStatic: true });
 }

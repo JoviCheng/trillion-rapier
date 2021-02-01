@@ -61,7 +61,7 @@ function createStaticBodies(world: Matter.World) {
   ]);
 }
 
-function createPinball(world, stopperGroup: number) {
+function createPinball(world: Matter.World, stopperGroup: number) {
   // x/y are set to when pinball is launched
   pinball = Matter.Bodies.circle(0, 0, PINBALL_SIZE, {
     label: "pinball",
@@ -86,10 +86,11 @@ function launchPinball() {
 
 export default function init(
   element: React.MutableRefObject<any>,
-  upScore: RootDispatch["main"]["updataScore"]
+  updataScore: RootDispatch["main"]["updataScore"]
 ) {
   function pingReward(level: number) {
-    upScore({ type: RewardType.BOTTOM, level });
+    console.log("🚀 ~ file: init.ts ~ line 92 ~ pingReward ~ level", level);
+    updataScore({ type: RewardType.BOTTOM, level });
 
     setTimeout(function () {
       launchPinball();
@@ -97,7 +98,7 @@ export default function init(
   }
 
   function pingBumper(bumper: Matter.Body) {
-    upScore({ type: RewardType.PEG });
+    updataScore({ type: RewardType.PEG });
 
     // flash color
     bumper.render.fillStyle = COLOR.BUMPER_LIT;
@@ -106,6 +107,7 @@ export default function init(
     }, 100);
   }
   engine = Matter.Engine.create();
+  engine.timing.timeScale = 1.2;
   world = engine.world;
   world.bounds = {
     min: { x: 0, y: 0 },
@@ -125,7 +127,6 @@ export default function init(
     },
   });
   Matter.Render.run(render);
-
   // runner
   let runner = Matter.Runner.create();
   Matter.Runner.run(runner, engine);
@@ -169,4 +170,18 @@ export default function init(
       }
     }
   });
+
+  // mouse drag (god mode for grabbing pinball)
+  Matter.World.add(
+    world,
+    Matter.MouseConstraint.create(engine, {
+      mouse: Matter.Mouse.create(render.canvas),
+      constraint: {
+        stiffness: 0.2,
+        render: {
+          visible: false,
+        },
+      },
+    })
+  );
 }

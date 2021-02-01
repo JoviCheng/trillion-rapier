@@ -22,8 +22,8 @@ export const main = createModel<RootModel>()({
     // handle state changes with impure functions.
     // use async/await for async actions
     async updataScore(payload: { type: RewardType; level?: number }, state) {
-      console.log("This is current root state", JSON.stringify(state.main));
       const { type, level } = payload;
+      console.log("This is current root state", level);
       //   await new Promise((resolve) => setTimeout(resolve, 1000));
       switch (type) {
         case RewardType.PEG:
@@ -31,7 +31,7 @@ export const main = createModel<RootModel>()({
           break;
         case RewardType.BOTTOM:
           dispatch.main.setFields({
-            score: state.main.score + 10 * Math.pow(2, level || 1),
+            score: state.main.score + 10 * Math.pow(2, level! * 10 || 1),
           });
           break;
       }

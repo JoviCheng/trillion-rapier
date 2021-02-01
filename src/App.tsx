@@ -29,7 +29,7 @@ function App() {
   }, []);
   return (
     <div className="App">
-      {score}
+      <div className="score">{score}</div>
       <div className="container" ref={containerRef}>
         <div className="score current-score">
           score<span></span>
