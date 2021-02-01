@@ -1,5 +1,12 @@
 import Matter from "matter-js";
-import { COLOR, PATHS, PEGS_GROUP, PINBALL_SIZE } from "../const";
+import {
+  COLOR,
+  PATHS,
+  PEGS_GROUP,
+  PINBALL_SIZE,
+  GRAVITY,
+  WIREFRAMES,
+} from "../const";
 import {
   PegFactory,
   BoundaryFactory,
@@ -10,6 +17,8 @@ import {
   ResetAreaFactory,
 } from "./Factory";
 import { rand } from "./index";
+import { RootDispatch } from "../model/";
+import { RewardType } from "../types/";
 
 let pinball: Matter.Body;
 let engine: Matter.Engine,
@@ -75,35 +84,27 @@ function launchPinball() {
   Matter.Body.setAngularVelocity(pinball, 0);
 }
 
-function updateScore(newCurrentScore) {
-  // currentScore = newCurrentScore;
-  // $currentScore.text(currentScore);
-  // totalScore = Math.max(currentScore, totalScore);
-  // $totalScore.text(totalScore);
-}
+export default function init(
+  element: React.MutableRefObject<any>,
+  upScore: RootDispatch["main"]["updataScore"]
+) {
+  function pingReward(level: number) {
+    upScore({ type: RewardType.BOTTOM, level });
 
-function pingReward(level: number) {
-  updateScore(0 * Math.pow(2, level));
+    setTimeout(function () {
+      launchPinball();
+    }, 1000);
+  }
 
-  // flash color
-  setTimeout(function () {
-    launchPinball();
-  }, 1000);
-}
+  function pingBumper(bumper: Matter.Body) {
+    upScore({ type: RewardType.PEG });
 
-function pingBumper(bumper: Matter.Body) {
-  updateScore(0 + 10);
-
-  // flash color
-  bumper.render.fillStyle = COLOR.BUMPER_LIT;
-  setTimeout(function () {
-    bumper.render.fillStyle = COLOR.BUMPER;
-  }, 100);
-}
-
-export default function init(element: React.MutableRefObject<any>) {
-  const GRAVITY = 0.75;
-  const WIREFRAMES = false;
+    // flash color
+    bumper.render.fillStyle = COLOR.BUMPER_LIT;
+    setTimeout(function () {
+      bumper.render.fillStyle = COLOR.BUMPER;
+    }, 100);
+  }
   engine = Matter.Engine.create();
   world = engine.world;
   world.bounds = {
@@ -131,11 +132,6 @@ export default function init(element: React.MutableRefObject<any>) {
 
   // used for collision filtering on various bodies
   stopperGroup = Matter.Body.nextGroup(true);
-
-  // starting values
-  let currentScore, totalScore;
-  currentScore = 0;
-  totalScore = 0;
 
   createStaticBodies(world);
   createPinball(world, stopperGroup);
