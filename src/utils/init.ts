@@ -61,38 +61,30 @@ function createStaticBodies(world: Matter.World) {
   ]);
 }
 
-function createPinball(world: Matter.World, stopperGroup: number) {
-  // x/y are set to when pinball is launched
-  pinball = Matter.Bodies.circle(0, 0, PINBALL_SIZE, {
-    label: "pinball",
-    restitution: 0.9,
-    collisionFilter: {
-      group: stopperGroup,
-    },
-    render: {
-      fillStyle: COLOR.PINBALL,
-    },
-  });
-  Matter.World.add(world, pinball);
-  launchPinball();
-}
-
-function launchPinball() {
-  // updateScore(0);
-  Matter.Body.setPosition(pinball, { x: 465, y: 765 });
-  Matter.Body.setVelocity(pinball, { x: 0, y: -25 + rand(-2, 2) });
-  Matter.Body.setAngularVelocity(pinball, 0);
-}
-
 export default function init(
   element: React.MutableRefObject<any>,
-  updataScore: RootDispatch["main"]["updataScore"]
+  updataScore: RootDispatch["main"]["updataScore"],
+  setFields: RootDispatch["main"]["setFields"]
 ) {
+  function launchPinball() {
+    // updateScore(0);
+    Matter.Body.setVelocity(pinball, { x: 0, y: 0 });
+    Matter.Body.setPosition(pinball, { x: 465, y: 765 });
+    let curVelocity = { x: 0, y: -27 + rand(-3, 1) };
+    setFields({
+      ball: {
+        speed: curVelocity,
+      },
+    });
+    Matter.Body.setVelocity(pinball, curVelocity);
+    Matter.Body.setAngularVelocity(pinball, 0);
+  }
+
   function pingReward(level: number) {
     console.log("🚀 ~ file: init.ts ~ line 92 ~ pingReward ~ level", level);
     updataScore({ type: RewardType.BOTTOM, level });
 
-    setTimeout(function () {
+    setTimeout(function() {
       launchPinball();
     }, 1000);
   }
@@ -102,9 +94,24 @@ export default function init(
 
     // flash color
     bumper.render.fillStyle = COLOR.BUMPER_LIT;
-    setTimeout(function () {
+    setTimeout(function() {
       bumper.render.fillStyle = COLOR.BUMPER;
     }, 100);
+  }
+
+  function createPinball(world: Matter.World, stopperGroup: number) {
+    // x/y are set to when pinball is launched
+    pinball = Matter.Bodies.circle(0, 0, PINBALL_SIZE, {
+      label: "pinball",
+      restitution: 0.9,
+      collisionFilter: {
+        group: stopperGroup,
+      },
+      render: {
+        fillStyle: COLOR.PINBALL,
+      },
+    });
+    Matter.World.add(world, pinball);
   }
   engine = Matter.Engine.create();
   engine.timing.timeScale = 1.2;
@@ -136,10 +143,11 @@ export default function init(
 
   createStaticBodies(world);
   createPinball(world, stopperGroup);
+  launchPinball();
 
-  Matter.Events.on(engine, "collisionStart", function (event) {
+  Matter.Events.on(engine, "collisionStart", function(event) {
     let pairs = event.pairs;
-    pairs.forEach(function (pair) {
+    pairs.forEach(function(pair) {
       if (pair.bodyB.label === "pinball") {
         switch (pair.bodyA.label) {
           case "reset":
@@ -156,7 +164,7 @@ export default function init(
     });
   });
 
-  Matter.Events.on(engine, "beforeUpdate", function (event) {
+  Matter.Events.on(engine, "beforeUpdate", function(event) {
     // bumpers can quickly multiply velocity, so keep that in check
     // 保险杠可以快速增加速度，所以要控制住
     // Matter.Body.setVelocity(pinball, {
@@ -165,8 +173,12 @@ export default function init(
     // });
     // cheap way to keep ball from going back down the shooter lane
     if (pinball) {
+      // console.log(
+      //   "🚀 ~ file: init.ts ~ line 169 ~ Matter.Events.on ~ pinball",
+      //   pinball.position.x
+      // );
       if (pinball.position.x > 450 && pinball.velocity.y > 0) {
-        Matter.Body.setVelocity(pinball, { x: 0, y: -10 });
+        Matter.Body.setVelocity(pinball, { x: 0, y: -20 });
       }
     }
   });
@@ -176,12 +188,12 @@ export default function init(
     world,
     Matter.MouseConstraint.create(engine, {
       mouse: Matter.Mouse.create(render.canvas),
-      constraint: {
-        stiffness: 0.2,
-        render: {
-          visible: false,
-        },
-      },
+      // constraint: {
+      //   stiffness: 0.2,
+      //   render: {
+      //     visible: false,
+      //   },
+      // },
     })
   );
 }

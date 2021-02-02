@@ -16,7 +16,7 @@ const mapDispatch = (dispatch: RootDispatch) => ({
 });
 
 function App() {
-  const [{ score }, { updataScore, setFields }] = useRematch(
+  const [{ score, ball }, { updataScore, setFields }] = useRematch(
     mapState,
     mapDispatch
   );
@@ -25,11 +25,12 @@ function App() {
   // const [score, setScore] = useState(0);
 
   useEffect(() => {
-    init(containerRef, updataScore);
+    init(containerRef, updataScore, setFields);
   }, []);
   return (
     <div className="App">
       <div className="score">{score}</div>
+      <div className="score2">{JSON.stringify(ball.speed)}</div>
       <div className="container" ref={containerRef}>
         <div className="score current-score">
           score<span></span>

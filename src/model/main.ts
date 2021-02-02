@@ -4,11 +4,23 @@ import { RewardType } from "../types/";
 
 interface MainState {
   score: number;
+  ball: {
+    speed: {
+      x: number;
+      y: number;
+    };
+  };
 }
 
 export const main = createModel<RootModel>()({
   state: {
     score: 0,
+    ball: {
+      speed: {
+        x: 0,
+        y: 0,
+      },
+    },
   } as MainState, // initial state
   reducers: {
     setFields(state: MainState, fields: Partial<MainState>): MainState {
@@ -23,7 +35,6 @@ export const main = createModel<RootModel>()({
     // use async/await for async actions
     async updataScore(payload: { type: RewardType; level?: number }, state) {
       const { type, level } = payload;
-      console.log("This is current root state", level);
       //   await new Promise((resolve) => setTimeout(resolve, 1000));
       switch (type) {
         case RewardType.PEG:
