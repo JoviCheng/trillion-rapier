@@ -29,7 +29,7 @@ export const main = createModel<RootModel>()({
         y: 0,
       },
     },
-  } as MainState, // initial state
+  } as MainState,
   reducers: {
     setFields(state: MainState, fields: Partial<MainState>): MainState {
       return {
@@ -39,7 +39,6 @@ export const main = createModel<RootModel>()({
     },
   },
   effects: (dispatch) => ({
-    // handle state changes with impure functions.
     // use async/await for async actions
     async updataScore(payload: { type: RewardType; level?: number }, state) {
       const { type, level } = payload;
@@ -47,12 +46,6 @@ export const main = createModel<RootModel>()({
       switch (type) {
         case RewardType.PEG:
           console.log(state.main.hitsCount.peg || 0);
-          // dispatch.main.setFields({
-          //   hitsCount: {
-          //     ...state.main.hitsCount,
-          //     peg: state.main.hitsCount.peg || 0 + 1,
-          //   },
-          // });
           dispatch.main.setFields({
             score: state.main.score + 10,
             hitsCount: {
