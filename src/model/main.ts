@@ -4,6 +4,7 @@ import { RewardType } from "../types/";
 
 interface MainState {
   score: number;
+
   hitsCount: {
     peg?: number;
     bottom?: number[];
