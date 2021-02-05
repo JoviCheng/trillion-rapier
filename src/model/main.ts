@@ -1,10 +1,11 @@
 import { createModel } from "@rematch/core";
+import BigNumber from "bignumber.js";
 import { RootModel } from "./index";
 import { RewardType } from "../types/";
 
 interface MainState {
   score: number;
-
+  baseHit: number;
   hitsCount: {
     peg?: number;
     bottom?: number[];
@@ -20,6 +21,7 @@ interface MainState {
 export const main = createModel<RootModel>()({
   state: {
     score: 0,
+    baseHit: 1,
     hitsCount: {
       peg: 0,
       bottom: [0, 0, 0],
@@ -47,8 +49,10 @@ export const main = createModel<RootModel>()({
       switch (type) {
         case RewardType.PEG:
           console.log(state.main.hitsCount.peg || 0);
+          let newHit = new BigNumber(state.main.baseHit).times(1.01).toNumber();
           dispatch.main.setFields({
-            score: state.main.score + 10,
+            baseHit: newHit,
+            score: state.main.score + newHit,
             hitsCount: {
               ...state.main.hitsCount,
               peg: state.main.hitsCount.peg! + 1,
@@ -60,9 +64,10 @@ export const main = createModel<RootModel>()({
           temp[level! - 1] = temp[level! - 1] + 1;
           dispatch.main.setFields({
             hitsCount: { ...state.main.hitsCount, bottom: temp },
+            baseHit: 1,
           });
           dispatch.main.setFields({
-            score: state.main.score + 10 * Math.pow(2, level! * 10 || 1),
+            // score: state.main.score + 10 * Math.pow(2, level! * 10 || 1),
           });
           break;
       }

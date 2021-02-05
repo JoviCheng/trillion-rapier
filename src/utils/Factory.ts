@@ -1,6 +1,20 @@
 import Matter from "matter-js";
 import { COLOR, PEGS_GROUP, awardAreaConfig } from "../const";
 
+export function createPegPart() {
+  const pegsPart: Matter.Body[] = [];
+  for (let row = 0; row < PEGS_GROUP.ROW; row++) {
+    const cols = row % 2 ? PEGS_GROUP.CLOS : PEGS_GROUP.CLOS - 1;
+    const offset = row % 2 ? 0 : PEGS_GROUP.BASE_SIZE / 2;
+    const y = PEGS_GROUP.TOP_OFFSET + PEGS_GROUP.BASE_SIZE * row;
+    for (let col = 0; col < cols; col++) {
+      const x = PEGS_GROUP.LEFT_OFFSET + PEGS_GROUP.BASE_SIZE * col + offset;
+      pegsPart.push(PegFactory(x, y));
+    }
+  }
+  return pegsPart;
+}
+
 export function PegFactory(x: number, y: number) {
   const PEG_SIZE = 2;
   const PINBALL_SIZE = 10;
