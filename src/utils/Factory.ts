@@ -1,5 +1,28 @@
 import Matter from "matter-js";
-import { COLOR, PEGS_GROUP, awardAreaConfig } from "../const";
+import { COLOR, PEGS_GROUP, awardAreaConfig, PATHS } from "../const";
+
+export function createStaticBodies(world: Matter.World) {
+  Matter.World.add(world, [
+    ...createPegPart(),
+    BoundaryFactory(250, -30, 500, 100),
+    BoundaryFactory(250, 830, 500, 100),
+    BoundaryFactory(-30, 400, 100, 800),
+    BoundaryFactory(530, 400, 100, 800),
+
+    // dome
+    PathFactory(250, 90, PATHS.DOME),
+
+    // pegs (left, mid, right)
+    WallFactory(445, 520, 20, 610, COLOR.OUTER),
+
+    // 三角墙
+    SideWallFactory(),
+    SideWallFactory(true),
+    AwardAreaFactory(),
+
+    ResetAreaFactory(465, 30),
+  ]);
+}
 
 export function createPegPart() {
   const pegsPart: Matter.Body[] = [];
